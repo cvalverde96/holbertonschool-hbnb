@@ -28,7 +28,7 @@ class Review:
     def validate_text(text: str) -> str:
         if not text:
             raise ValueError("Text required")
-        return (next)
+        return (text)
     
     
     """
