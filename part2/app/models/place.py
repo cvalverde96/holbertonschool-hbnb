@@ -1,13 +1,7 @@
 #!/usr/bin/python3
 
-from base import BaseModel
-from user import User
-
-
-"""
-importamos uuid para crear el unique identifier
-importamos datetime para tener el tiempo acutal exacto
-"""
+from app.models.base import BaseModel
+from app.models.user import User
 
 class Place(BaseModel):
     def __init__(self, title: str, price: float, latitude: float, longitude: float, owner: "User", description: str = None):
@@ -19,50 +13,32 @@ class Place(BaseModel):
         self.longitude = self.validate_longitude(longitude)
         self.owner = self.validate_owner(owner)
         self.reviews = []
+        self.amenities = []
     
-    
-    """
-    metodo estatico que asegura que titilo no este vacio
-    y su len no sea mayor de 100 chars
-    """   
     @staticmethod
     def validate_title(title: str) -> str:
         if not title or len(title) > 100:
             raise ValueError("Title is required and/or should be less than or equal to 100 characters.")
         return (title)
     
-    """
-    metodo estatico que asegura que precio debe ser un valor positivo
-    """
     @staticmethod
     def validate_price(price: float) -> float:
         if price <= 0:
             raise ValueError("Price must be a positive value.")
         return (price)
     
-    
-    """
-    metodo estatico que asegura que latitud este dentro de cierto rango
-    """
     @staticmethod
     def validate_latitude(latitude: float) -> float:
         if not (-90.0 <= latitude <= 90.0):
             raise ValueError("Latitude must be within the range of -90.0 to 90.0.")
         return (latitude)
     
-    
-    """
-    metodo estatico que asegura que longitud este dentro de cierto rango
-    """
     @staticmethod
     def validate_longitude(longitude: float) -> float:
         if not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be within the range of -180.0 to 180.0.")
         return (longitude)
     
-    """
-    metodo estatico que asegura que owner sea una instancia de User
-    """
     @staticmethod
     def validate_owner(owner: "User") -> "User":
         if not isinstance(owner, User):
@@ -76,9 +52,7 @@ class Place(BaseModel):
             self.reviews.append(review)
         else:
             raise ValueError("Invalid review object")
-    """
-    metodo para validar los atributes y llama las diferentes funciones de validacion
-    """
+    
     def update(self, title: str = None, price: float = None, latitude: float = None, longitude: float = None, description: str = None, owner: "User" = None):
         if title:
             self.title = self.validate_title(title)
