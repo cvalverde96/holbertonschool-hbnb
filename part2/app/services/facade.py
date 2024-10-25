@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 
-from ..persistence.repository import InMemoryRepository
-from ..models import Amenity, User, Place, Review
+from app.persistence.repository import InMemoryRepository
+# from app.models import Amenity, User, Place, Review
+from app.models.user import User
+from app.models.amenity import Amenity
+from app.models.place import Place
+from app.models.review import Review
+import uuid
 
 class HBnBFacade:
     def __init__(self):
@@ -10,18 +15,40 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
+    # USER
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
         return user
     
     def get_user(self, user_id):
+        try:
+            user_id = str(uuid.UUID(user_id))
+        except ValueError:
+            return None
         return self.user_repo.get(user_id)
-    
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
     
+    def get_all_users(self):
+        return (self.user_repo.get_all())
+    
+    def update_user(self, user_id, user_data):
+        user = self.get_user(user_id)
+        if not user:
+            return None
+        
+        if 'first_name' in user_data:
+            user.first_name = User.validate_name(user_data['first_name'])  
+        if 'last_name' in user_data:
+            user.last_name = User.validate_name(user_data['last_name'])  
+        if 'email' in user_data:
+            user.email = User.validate_email(user_data['email']) 
+
+        self.user_repo.update(user_id, user)
+        return user
+        
+    # AMENITY
     def create_amenity(self, amenity_data):
         if 'name' not in amenity_data or not amenity_data['name']:
             raise ValueError("Amenity name is required.")
@@ -59,6 +86,7 @@ class HBnBFacade:
         
         return (amenity)
     
+    # PLACE
     def create_place(self, place_data):
         owner = self.user_repo.get(place_data['owner_id'])
         if not owner:
@@ -132,7 +160,7 @@ class HBnBFacade:
         if not place:
             raise ValueError(f"Place with ID '{place_id}' not found.")
 
-        # Update attributes if provided
+        
         if 'title' in place_data:
             place.title = place_data['title']
         if 'description' in place_data:
@@ -150,7 +178,7 @@ class HBnBFacade:
                 raise ValueError("Longitude must be between -180 and 180.")
             place.longitude = place_data['longitude']
 
-        # Handle amenities if provided
+        
         if 'amenity_ids' in place_data:
             place.amenities.clear()
             for amenity_id in place_data['amenity_ids']:
@@ -158,10 +186,11 @@ class HBnBFacade:
                 if amenity:
                     place.amenities.append(amenity)
 
-        # Save the updated place
+       
         self.place_repo.update(place_id, place)
         return place
     
+    # REVIEW
     def create_review(self, review_data):
         user = self.user_repo.get(review_data['user_id'])
         if not user:
@@ -226,11 +255,11 @@ class HBnBFacade:
         if not review:
             raise ValueError(f"Review with ID '{review_id}' not found.")
         
-        # Remove the review from the place
+        
         place = review.place
         place.reviews.remove(review)
         self.place_repo.update(place.id, place)
         
-        # Delete the review from the repository
+        
         self.review_repo.delete(review_id)
         return f"Review {review_id} deleted successfully."
