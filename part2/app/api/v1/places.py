@@ -1,5 +1,7 @@
+#!/usr/bin/python3
+
 from flask_restx import Namespace, Resource, fields
-from ...services import facade
+from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
@@ -79,11 +81,7 @@ class PlaceResource(Resource):
         try:
             updated_place = facade.update_place(place_id, place_data)
             return {
-                'id': updated_place.id,
-                'title': updated_place.title,
-                'price': updated_place.price,
-                'latitude': updated_place.latitude,
-                'longitude': updated_place.longitude
+                'message': 'Place updated successfully'
             }, 200
         except ValueError as e:
             return {'error': str(e)}, 400
