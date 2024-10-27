@@ -3,6 +3,7 @@
 from app.models.base import BaseModel
 from app.models.user import User
 
+
 class Place(BaseModel):
     def __init__(self, title: str, price: float, latitude: float, longitude: float, owner: "User", description: str = None):
         super().__init__()
@@ -47,8 +48,8 @@ class Place(BaseModel):
     
     
     def add_review(self, review):
-        from review import Review
-        if isinstance(review, Review):  # Make sure the review passed is of the correct type
+        from app.models.review import Review
+        if isinstance(review, Review): 
             self.reviews.append(review)
         else:
             raise ValueError("Invalid review object")
@@ -66,7 +67,6 @@ class Place(BaseModel):
             self.description = description
         if owner:
             self.owner = self.validate_owner(owner)
-        # para actualizar el timestamp de updated_at
         super().update()
     
     
