@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-from base import BaseModel
+from app.models.base import BaseModel
 
-class Amenity():
+class Amenity(BaseModel):
     def __init__(self, name: str):
         super().__init__()
         self.name = self.validate_name(name)
@@ -14,10 +14,10 @@ class Amenity():
             raise ValueError("Name is required and should be less than or equal to 50 characters.")
         return (name)
     
-    def update(self, name: str = None):
-        if name:
-            self.name = self.validate_name(name)
-        super().update()
+    class Amenity(BaseModel):
+        def update(self, **kwargs):
+            super().update()
+            self.updated_timestamp()
         
     def __str__(self):
         return (f"Amenity(id={self.id}, name={self.name}, "
