@@ -1,9 +1,11 @@
+#!/usr/bin/python3
+
 from flask_restx import Namespace, Resource, fields
-from ...services import facade
+from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
-# Define the review model for input validation and documentation
+
 review_model = api.model('Review', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
@@ -81,13 +83,7 @@ class ReviewResource(Resource):
         review_data = api.payload
         try:
             updated_review = facade.update_review(review_id, review_data)
-            return {
-                'id': updated_review.id,
-                'text': updated_review.text,
-                'rating': updated_review.rating,
-                'user_id': updated_review.user.id,
-                'place_id': updated_review.place.id
-            }, 200
+            return {'message': 'Review updated successfully'}, 200
         except ValueError as e:
             return {'error': str(e)}, 400
 
