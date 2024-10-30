@@ -10,7 +10,8 @@ api = Namespace('users', description='User operations')
 user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
-    'email': fields.String(required=True, description='Email of the user')
+    'email': fields.String(required=True, description='Email of the user'),
+    'password': fields.String(required=True, description='Password of the user')
 })
 
 @api.route('/')
@@ -26,9 +27,12 @@ class UserList(Resource):
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
-
+        
+        user_data['password'] = facade.hash_password(user_data['password'])
+        
         new_user = facade.create_user(user_data)
-        return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+        
+        return {'id': new_user.id, 'message': 'User created successfully'}, 201
     
     @api.response(200, 'User list retrieved succesfully')
     def get(self):
@@ -61,6 +65,9 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+        
+        if 'password' in user_data:
+            user_data['password'] = facade.hash_password(user_data['password'])
         
         updated_user = facade.update_user(user_id, user_data)
         return {
