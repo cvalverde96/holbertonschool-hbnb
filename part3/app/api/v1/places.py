@@ -49,9 +49,11 @@ class PlaceList(Resource):
             return {
                 'id': new_place.id,
                 'title': new_place.title,
+                'description': new_place.description,
                 'price': new_place.price,
                 'latitude': new_place.latitude,
-                'longitude': new_place.longitude
+                'longitude': new_place.longitude,
+                'owner_id': new_place.owner_id
             }, 201
         except ValueError as e:
             return {'error': str(e)}, 400

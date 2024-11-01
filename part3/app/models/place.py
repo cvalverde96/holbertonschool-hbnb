@@ -13,6 +13,7 @@ class Place(BaseModel):
         self.latitude = self.validate_latitude(latitude)
         self.longitude = self.validate_longitude(longitude)
         self.owner = self.validate_owner(owner)
+        self.owner_id = self.owner.id
         self.reviews = []
         self.amenities = []
     
